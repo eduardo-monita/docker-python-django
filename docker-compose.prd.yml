@@ -1,0 +1,54 @@
+version: "3.7"
+   
+services:
+  web:
+    build: .
+    container_name: docker-pyhton-django-web-prd
+    command: gunicorn --bind=:8000 --reload main.wsgi
+    volumes:
+      - ./app:/app
+    expose: 
+      - 8000
+    env_file:
+      - ./.env.web.prd
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - docker-pyhton-django
+
+  db:
+    image: postgres:13
+    container_name: docker-pyhton-django-db-prd
+    volumes:
+      - ./data/db-prd:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    env_file:
+    - ./.env.db.prd
+    networks:
+      - docker-pyhton-django
+
+  nginx:
+    build: ./nginx
+    container_name: docker-pyhton-django-nginx-prd
+    volumes:
+      - ./app/media:/usr/src/app/media
+      - ./app/static:/usr/src/app/static
+    ports:
+      - "9100:80"
+    depends_on:
+      - web
+    networks:
+      - docker-pyhton-django
+      
+networks:
+  docker-pyhton-django:
+    name: docker-pyhton-django-prd
+    driver: bridge
