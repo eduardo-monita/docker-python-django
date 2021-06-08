@@ -61,7 +61,7 @@ Meu projeto de referência utilizando Docker com aplicações em Django
         python manage.py test
         
 ## Rotas
-- Rotas |HTTP | Resultado
+Rotas |HTTP | Resultado
 -- | -- |-- 
 `admin` | GET | Para acessar o admin padrão do próprio Django
 `api/client` | GET | Pegar a lista de clientes
